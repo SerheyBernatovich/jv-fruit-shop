@@ -7,6 +7,13 @@ import core.basesyntax.service.OperationHandler;
 public class ReturnOperation implements OperationHandler {
     @Override
     public void process(FruitTransaction transaction) {
-        Storage.fruits.merge(transaction.getFruit(), transaction.getQuantity(), Integer::sum);
+        int currentBalance = Storage.fruits.getOrDefault(transaction.getFruit(), 0);
+        int newBalance = currentBalance + transaction.getQuantity();
+        if (newBalance < 0) {
+            throw new RuntimeException("Invalid return operation for: "
+                    + transaction.getFruit());
+        }
+        Storage.fruits.put(transaction.getFruit(), newBalance);
     }
 }
+
